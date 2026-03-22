@@ -15,9 +15,10 @@ export default function Root() {
       setLoading(true);
       setError("");
       const data = await fetchOrders(status);
-      setOrders(data);
+      /* ordena pelo mais novo */
+      setOrders(data.sort((a, b) => b.id - a.id));
     } catch (err) {
-      setError("Erro ao carregar pedidos.");
+        setError(err instanceof Error ? err.message : "Erro ao carregar pedidos.");
     } finally {
       setLoading(false);
     }
@@ -31,9 +32,12 @@ export default function Root() {
     try {
       setError("");
       await createOrder(payload);
+
+      alert("Pedido criado com sucesso!");
+
       await loadOrders(statusFilter || undefined);
     } catch (err) {
-      setError("Erro ao criar pedido.");
+      setError(err instanceof Error ? err.message : "Erro ao criar pedido.");
     }
   }
 
@@ -56,10 +60,10 @@ export default function Root() {
           }}
         >
           <option value="">Todos</option>
-          <option value="pending">pendente</option>
-          <option value="processing">em processamento</option>
-          <option value="completed">finalizado</option>
-          <option value="cancelled">cancelado</option>
+          <option value="pendente">pendente</option>
+          <option value="processando">em processamento</option>
+          <option value="concluído">concluído</option>
+          <option value="cancelado">cancelado</option>
         </select>
       </div>
 
