@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  users-db:
+    image: postgres:16
+    container_name: users-db
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: ${USERS_DB_USER}
+      POSTGRES_PASSWORD: ${USERS_DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - users_data:/var/lib/postgresql/data
+
+  users-service:
+    build: ./backend/users-service
+    container_name: users-service
+    environment:
+      DATABASE_URL: postgresql://${USERS_DB_USER}:${USERS_DB_PASSWORD}@users-db:5432/users_db
+    ports:
+      - "8001:8000"
+    depends_on:
+      users-db:
+        condition: service_started
+
+  orders-db:
+    image: postgres:16
+    container_name: orders-db
+    environment:
+      POSTGRES_DB: orders_db
+      POSTGRES_USER: ${ORDERS_DB_USER}
+      POSTGRES_PASSWORD: ${ORDERS_DB_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - orders_data:/var/lib/postgresql/data
+
+  orders-service:
+    build: ./backend/orders-service
+    container_name: orders-service
+    environment:
+      DATABASE_URL: postgresql://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/orders_db
+    ports:
+      - "8002:8000"
+    depends_on:
+      orders-db:
+        condition: service_started
+
+
+volumes:
+  users_data:
+  orders_data:
