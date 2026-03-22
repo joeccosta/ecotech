@@ -21,3 +21,7 @@ Projeto de estudo com arquitetura de microserviços e microfrontends usando:
 
 ```bash
 docker compose up --build
+
+Documentação
+	•	http://localhost:8001/docs
+	•	http://localhost:8002/docs
