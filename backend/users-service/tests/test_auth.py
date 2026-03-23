@@ -1,33 +1,30 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from uuid import uuid4
 
 client = TestClient(app)
 
 
-def create_test_user(
-    name: str = "Joe Costa",
-    email: str = "joe.auth@gmail.com",
-    password: str = "Teste123",
-):
-    response = client.post(
+def create_test_user(name="Joe", email=None, password="Teste123"):
+    unique_email = email or f"test-{uuid4().hex}@example.com"
+    return client.post(
         "/users/",
         json={
             "name": name,
-            "email": email,
+            "email": unique_email,
             "password": password,
         },
     )
-    return response
 
 
 def login_test_user(
-    email: str = "joe.auth@gmail.com",
+    email: str,
     password: str = "Teste123",
 ):
     response = client.post(
         "/auth/login",
-        json={
-            "email": email,
+        data={
+            "username": email,
             "password": password,
         },
     )
@@ -35,10 +32,11 @@ def login_test_user(
 
 
 def test_login_returns_access_token():
-    create_response = create_test_user()
+    email = f"test-{uuid4().hex}@example.com"
+    create_response = create_test_user(email=email)
     assert create_response.status_code in (200, 201), create_response.text
 
-    login_response = login_test_user()
+    login_response = login_test_user(email=email)
     assert login_response.status_code == 200, login_response.text
 
     data = login_response.json()
@@ -49,13 +47,14 @@ def test_login_returns_access_token():
 
 def test_secure_route_with_valid_token():
     create_response = create_test_user(
-        email="joe.secure@gmail.com",
+        email=f"secure-{uuid4().hex}@example.com",
         password="Teste123",
     )
     assert create_response.status_code in (200, 201), create_response.text
 
+    email = create_response.json()["email"]
     login_response = login_test_user(
-        email="joe.secure@gmail.com",
+        email=email,
         password="Teste123",
     )
     assert login_response.status_code == 200, login_response.text
@@ -69,27 +68,25 @@ def test_secure_route_with_valid_token():
 
     assert secure_response.status_code == 200, secure_response.text
     data = secure_response.json()
-    assert "user_id" in data
+    assert "id" in data
 
 
 def test_secure_route_without_token():
     response = client.get("/users/secure")
     assert response.status_code == 401, response.text
+    assert response.json()["detail"] == "Not authenticated"
 
 
 def test_login_with_invalid_password():
     create_response = create_test_user(
-        email="joe.invalid@gmail.com",
+        email=f"invalid-{uuid4().hex}@example.com",
         password="Teste123",
     )
     assert create_response.status_code in (200, 201), create_response.text
 
-    login_response = client.post(
-        "/auth/login",
-        json={
-            "email": "joe.invalid@gmail.com",
-            "password": "SenhaErrada123",
-        },
+    login_response = login_test_user(
+        email=create_response.json()["email"],
+        password="SenhaErrada123",
     )
 
     assert login_response.status_code in (400, 401), login_response.text

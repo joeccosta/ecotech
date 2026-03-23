@@ -1,8 +1,7 @@
-
 import pytest
 from pydantic import ValidationError
 
-from app.schemas import UserCreate, UserLogin, Token, UserResponse
+from app.schemas import UserCreate, Token, UserResponse
 
 
 def test_user_create_success():
@@ -22,6 +21,7 @@ def test_user_create_invalid_email():
         UserCreate(
             name="Joe Costa",
             email="email-invalido",
+            password="Teste123",
         )
 
     errors = exc.value.errors()
@@ -32,37 +32,19 @@ def test_user_create_missing_name():
     with pytest.raises(ValidationError) as exc:
         UserCreate(
             email="joe@example.com",
+            password="Teste123",
         )
 
     errors = exc.value.errors()
     assert any(error["loc"] == ("name",) for error in errors)
 
 
-def test_user_login_success():
-    login = UserLogin(
-        email="joe@example.com",
-        password="123456",
-    )
-
-    assert login.email == "joe@example.com"
-    assert login.password == "123456"
-
-
-def test_user_login_invalid_email():
+def test_user_create_short_password():
     with pytest.raises(ValidationError) as exc:
-        UserLogin(
-            email="invalido",
-            password="123456",
-        )
-
-    errors = exc.value.errors()
-    assert any(error["loc"] == ("email",) for error in errors)
-
-
-def test_user_login_missing_password():
-    with pytest.raises(ValidationError) as exc:
-        UserLogin(
+        UserCreate(
+            name="Joe Costa",
             email="joe@example.com",
+            password="12345",
         )
 
     errors = exc.value.errors()
