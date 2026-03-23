@@ -48,7 +48,7 @@ def update_status(order_id: int, payload: OrderStatusUpdate, db: Session = Depen
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    order.status = payload.status
+    order.status = payload.status.value
     db.commit()
     db.refresh(order)
 

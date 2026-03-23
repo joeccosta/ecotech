@@ -1,6 +1,13 @@
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
+from enum import Enum
 
+class OrderStatus(str, Enum):
+    pending = "pending"
+    processing = "processing"
+    shipped = "shipped"
+    delivered = "delivered"
+    cancelled = "cancelled"
 
 class OrderCreate(BaseModel):
     customer_name: str
@@ -20,4 +27,4 @@ class OrderResponse(BaseModel):
 
 
 class OrderStatusUpdate(BaseModel):
-    status: str
+    status: OrderStatus
