@@ -2,8 +2,11 @@ from fastapi import FastAPI
 
 from .database import Base, engine, wait_for_db
 from .routers.users import router as users_router
+from .routers.auth import router as auth_router
 
 app = FastAPI(title="Users Service", version="1.0.0")
+
+app.include_router(auth_router)
 
 Base.metadata.create_all(bind=engine)
 

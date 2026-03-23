@@ -1,9 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from ..security import hash_password
 
 from ..database import get_db
 from ..models import User
 from ..schemas import UserCreate, UserResponse
+from fastapi import Depends
+from ..security_dependency import get_current_user
+
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -12,6 +16,9 @@ router = APIRouter(prefix="/users", tags=["users"])
 def list_users(db: Session = Depends(get_db)):
     return db.query(User).all()
 
+@router.get("/secure")
+def secure_route(user=Depends(get_current_user)):
+    return {"user_id": user}
 
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db)):
@@ -30,7 +37,11 @@ def create_user(payload: UserCreate, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    user = User(name=payload.name, email=payload.email)
+    user = User(
+        name=payload.name, 
+        email=payload.email,
+        password_hash=hash_password(payload.password)
+        )
     db.add(user)
     db.commit()
     db.refresh(user)
