@@ -4,9 +4,10 @@ import { updateOrderStatus } from "../api/orders";
 
 type Props = {
   orders: Order[];
+  onStatusUpdated?: () => Promise<void> | void;
 };
 
-export default function OrderList({ orders }: Props) {
+export default function OrderList({ orders, onStatusUpdated }: Props) {
   const [localOrders, setLocalOrders] = useState<Order[]>(orders);
 
   useEffect(() => {
@@ -22,6 +23,10 @@ export default function OrderList({ orders }: Props) {
           order.id === orderId ? { ...order, ...updatedOrder } : order
         )
       );
+
+      if (onStatusUpdated) {
+        await onStatusUpdated();
+      }
     } catch (error) {
       console.error("Erro ao atualizar status do pedido:", error);
       alert("Não foi possível atualizar o status do pedido.");

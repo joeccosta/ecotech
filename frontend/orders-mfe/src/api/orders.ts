@@ -16,7 +16,7 @@ export async function fetchOrders(status?: string): Promise<Order[]> {
   /* explicitamente trazendo o erro */
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.details) || "Erro ao buscar pedidos";
+    throw new Error(errorData.detail) || "Erro ao buscar pedidos";
   }
 
   return response.json();
@@ -37,14 +37,14 @@ export async function createOrder(payload: {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.details) || "Falha ao criar pedido!";
+    throw new Error(errorData.detail) || "Falha ao criar pedido!";
   }
 
   return response.json();
 }
 
 export async function updateOrderStatus(id: number, status: string) {
-  const response = await fetch(`${BASE_URL}/orders/${id}/status`, {
+  const response = await fetch(`${BASE_URL}/${id}/status`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

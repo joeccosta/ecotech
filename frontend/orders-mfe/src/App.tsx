@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import OrderForm from "./components/OrderForm";
 import OrderList from "./components/OrderList";
 import { createOrder, fetchOrders, Order } from "./api/orders";
-import { registerApplication, start } from "single-spa";
 
 export default function Root() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -16,10 +15,9 @@ export default function Root() {
       setLoading(true);
       setError("");
       const data = await fetchOrders(status);
-      /* ordena pelo mais novo */
       setOrders(data.sort((a, b) => b.id - a.id));
     } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro ao carregar pedidos.");
+      setError(err instanceof Error ? err.message : "Erro ao carregar pedidos.");
     } finally {
       setLoading(false);
     }
@@ -61,10 +59,11 @@ export default function Root() {
           }}
         >
           <option value="">Todos</option>
-          <option value="pending">pendente</option>
-          <option value="processing">em processamento</option>
-          <option value="complete">concluído</option>
-          <option value="cancelled">cancelado</option>
+          <option value="pending">pending</option>
+          <option value="processing">processing</option>
+          <option value="shipped">shipped</option>
+          <option value="delivered">delivered</option>
+          <option value="cancelled">cancelled</option>
         </select>
       </div>
 
@@ -73,7 +72,10 @@ export default function Root() {
 
       <OrderForm onCreate={handleCreate} />
       <hr />
-      <OrderList orders={orders} />
+      <OrderList
+        orders={orders}
+        onStatusUpdated={() => loadOrders(statusFilter || undefined)}
+      />
     </div>
   );
 }
