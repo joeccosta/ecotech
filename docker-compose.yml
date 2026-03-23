@@ -20,6 +20,8 @@ services:
       DATABASE_URL: postgresql://${USERS_DB_USER}:${USERS_DB_PASSWORD}@users-db:5432/users_db
     ports:
       - "8001:8000"
+    volumes:
+      - ./backend/users-service:/app  
     depends_on:
       users-db:
         condition: service_started
@@ -43,6 +45,8 @@ services:
       DATABASE_URL: postgresql://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/orders_db
     ports:
       - "8002:8000"
+    volumes:
+      - ./backend/orders-service:/app
     depends_on:
       orders-db:
         condition: service_started
