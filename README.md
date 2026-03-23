@@ -118,6 +118,7 @@ docker compose up --build
 - Atualização de status
 - Criação e listagem de usuários
 - Testes automatizados no backend
+- Autenticação JWT compartilhada
 
 ---
 
@@ -155,7 +156,6 @@ Escolhido por:
 
 ## 10. Próximos Passos (Evoluções Possíveis)
 
-- Autenticação JWT compartilhada
 - API Gateway / BFF
 - Comunicação assíncrona (RabbitMQ ou Kafka)
 - Observabilidade (logs estruturados, tracing)
@@ -164,7 +164,71 @@ Escolhido por:
 
 ---
 
-## 11. Considerações Finais
+## 11. Autenticação e Autorização (JWT)
+
+A aplicação utiliza autenticação baseada em **JSON Web Tokens (JWT)** para garantir segurança entre os microsserviços.
+
+### 11.1 Fluxo de Autenticação
+
+1. O cliente realiza login no `users-service` enviando email e senha.
+2. O `users-service` valida as credenciais.
+3. Em caso de sucesso, um JWT é gerado contendo:
+   - `sub`: identificação do usuário (email)
+   - `exp`: tempo de expiração
+4. O token é retornado ao cliente.
+
+### 11.2 Uso do Token
+
+O cliente deve incluir o token nas requisições subsequentes:
+
+```
+Authorization: Bearer <access_token>
+```
+
+### 11.3 Validação entre Microsserviços
+
+Os serviços (como o `orders-service`) **não consultam o `users-service` para validar o token**.
+
+A validação é feita localmente por cada serviço:
+- decodificação do JWT
+- verificação da assinatura
+- verificação de expiração
+
+Isso é possível porque todos os serviços compartilham a mesma `SECRET_KEY`.
+
+### 11.4 Proteção de Rotas
+
+Rotas protegidas utilizam dependências do FastAPI, como:
+
+```python
+@router.get("/secure")
+def secure_route(user=Depends(get_current_user)):
+    return {"user_id": user}
+```
+
+A função `get_current_user`:
+- extrai o token do header
+- valida o JWT
+- retorna o usuário autenticado ou erro 401
+
+### 11.5 Características da Abordagem
+
+- Stateless: não há armazenamento de sessão no servidor
+- Escalável: não requer comunicação entre serviços para autenticação
+- Desacoplado: cada serviço valida o token de forma independente
+
+### 11.6 Limitações e Evoluções Futuras
+
+A abordagem atual utiliza uma chave secreta compartilhada (`SECRET_KEY`), o que pode gerar acoplamento entre serviços.
+
+Evoluções possíveis:
+- Uso de chave pública/privada (RS256)
+- Adoção de um provedor de identidade (ex: Keycloak, Auth0)
+- Introdução de API Gateway para centralizar autenticação
+
+---
+
+## 12. Considerações Finais
 
 Este projeto demonstra a construção de um sistema distribuído com separação clara de responsabilidades, integração entre frontend e backend e uso de práticas modernas de desenvolvimento.
 
