@@ -9,10 +9,12 @@ def test_user_create_success():
     user = UserCreate(
         name="Joe Costa",
         email="joe@example.com",
+        password="Teste123"
     )
 
     assert user.name == "Joe Costa"
     assert user.email == "joe@example.com"
+    assert user.password == "Teste123"
 
 
 def test_user_create_invalid_email():
