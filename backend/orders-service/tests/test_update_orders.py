@@ -1,11 +1,16 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
 from app.security import get_current_user
 
-app.dependency_overrides[get_current_user] = lambda: 1
 client = TestClient(app)
 
+@pytest.fixture(autouse=True)
+def override_auth():
+    app.dependency_overrides[get_current_user] = lambda: 1
+    yield
+    app.dependency_overrides.clear()
 
 def create_sample_order():
     payload = {

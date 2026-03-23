@@ -106,13 +106,11 @@ def test_quantity_must_be_greater_than_zero_for_negative_numbers():
     assert response.status_code == 422
     
 def test_create_order_requires_authentication():
-    payload = {
+    response = client.post("/orders", json={
         "customer_name": "Maria",
         "product": "Notebook",
         "quantity": 2
-    }
-
-    response = client.post("/orders", json=payload)
+    })
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Not authenticated"
