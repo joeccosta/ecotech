@@ -42,3 +42,19 @@ export async function createOrder(payload: {
 
   return response.json();
 }
+
+export async function updateOrderStatus(id: number, status: string) {
+  const response = await fetch(`${BASE_URL}/orders/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Erro ao atualizar status do pedido");
+  }
+
+  return response.json();
+}
