@@ -1,7 +1,7 @@
 {
   "name": "@ecotech/orders-mfe",
   "scripts": {
-    "start": "webpack serve",
+    "start": "webpack serve --port 8500",
     "start:standalone": "webpack serve --env standalone",
     "build": "concurrently npm:build:*",
     "build:webpack": "webpack --mode=production",
@@ -11,7 +11,7 @@
     "check-format": "prettier --check .",
     "test": "cross-env BABEL_ENV=test jest",
     "watch-tests": "cross-env BABEL_ENV=test jest --watch",
-    "prepare": "husky install",
+    "prepare": "test -d .git && husky install || true",
     "coverage": "cross-env BABEL_ENV=test jest --coverage",
     "build:types": "tsc"
   },

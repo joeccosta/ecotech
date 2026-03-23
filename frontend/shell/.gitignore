@@ -70,3 +70,12 @@ dist
 *.sln
 *.sw?
 .DS_Store
+
+# frontend
+node_modules
+dist
+.git
+coverage
+.env
+npm-debug.log
+.DS_Store
