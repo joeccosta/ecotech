@@ -151,6 +151,13 @@ Escolhido por:
 - Testes automatizados com Pytest
 - Cobertura dos principais endpoints do orders-service
 - Validação de cenários de erro (status inválido, recurso inexistente)
+- Comportamento: 
+	•	validação de token funcionando (401 para ausência/invalidez)
+	•	testes cobrindo:
+	•	fluxo feliz (201)
+	•	validação de payload (422)
+	•	ausência de token (401)
+	•	token inválido (401)
 
 ---
 

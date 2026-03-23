@@ -4,12 +4,17 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import Order
 from ..schemas import OrderCreate, OrderResponse, OrderStatusUpdate
+from ..security import get_current_user
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
 @router.post("/", response_model=OrderResponse, status_code=201)
-def create_order(payload: OrderCreate, db: Session = Depends(get_db)):
+def create_order(
+    payload: OrderCreate, 
+    db: Session = Depends(get_db),
+    _current_user: str = Depends(get_current_user),
+    ):
     order = Order(
         customer_name=payload.customer_name,
         product=payload.product,
@@ -42,7 +47,12 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{order_id}/status", response_model=OrderResponse)
-def update_status(order_id: int, payload: OrderStatusUpdate, db: Session = Depends(get_db)):
+def update_status(
+    order_id: int, 
+    payload: OrderStatusUpdate, 
+    db: Session = Depends(get_db),
+    _current_user: str = Depends(get_current_user),
+    ):
     order = db.query(Order).filter(Order.id == order_id).first()
 
     if not order:
