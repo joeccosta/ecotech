@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import OrderForm from "./components/OrderForm";
 import OrderList from "./components/OrderList";
 import { createOrder, fetchOrders, Order } from "./api/orders";
+import { registerApplication, start } from "single-spa";
 
 export default function Root() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -60,10 +61,10 @@ export default function Root() {
           }}
         >
           <option value="">Todos</option>
-          <option value="pendente">pendente</option>
-          <option value="processando">em processamento</option>
-          <option value="concluído">concluído</option>
-          <option value="cancelado">cancelado</option>
+          <option value="pending">pendente</option>
+          <option value="processing">em processamento</option>
+          <option value="complete">concluído</option>
+          <option value="cancelled">cancelado</option>
         </select>
       </div>
 

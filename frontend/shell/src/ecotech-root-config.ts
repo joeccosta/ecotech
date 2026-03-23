@@ -17,7 +17,7 @@ registerApplication({
       /* webpackIgnore: true */ // @ts-ignore-next
       "@ecotech/orders-mfe"
     ),
-  activeWhen: (location) => location.pathname === "/",
+  activeWhen: (location) => location.pathname === "/orders",
 });
 
 start({
