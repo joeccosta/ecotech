@@ -139,6 +139,40 @@ docker compose up --build
 
 ---
 
+## 7.1 Variáveis de Ambiente (.env)
+
+O projeto utiliza um arquivo `.env` na raiz para configuração dos serviços.
+
+### Banco de dados
+
+```
+USERS_DB_NAME=users_db
+USERS_DB_USER=...
+USERS_DB_PASSWORD=...
+
+ORDERS_DB_NAME=orders_db
+ORDERS_DB_USER=...
+ORDERS_DB_PASSWORD=...
+```
+
+### Autenticação (JWT)
+
+```
+SECRET_KEY=ecotech-secret
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+```
+
+### Observações
+
+- `SECRET_KEY` deve ser **idêntica em todos os serviços**
+- `ALGORITHM` deve ser consistente (ex: HS256)
+- `ACCESS_TOKEN_EXPIRE_MINUTES` define o tempo de expiração do token
+
+Sem esse alinhamento, a validação do JWT entre microsserviços falhará (erro 401).
+
+---
+
 ## 8. Testes
 
 Executar:
