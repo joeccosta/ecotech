@@ -21,13 +21,18 @@ async def log_requests(request: Request, call_next):
     request_id = str(uuid.uuid4())
     start_time = time.perf_counter()
 
+    started_data = {
+        "event": "request_started",
+        "request_id": request_id,
+        "method": request.method,
+        "path": request.url.path,
+    }
+
     logger.info(
         "request_started",
         extra={
-            "event": "request_started",
-            "request_id": request_id,
-            "method": request.method,
-            "path": request.url.path,
+            **started_data,
+            "structured_data": started_data,
         },
     )
 
@@ -35,29 +40,38 @@ async def log_requests(request: Request, call_next):
         response = await call_next(request)
     except Exception:
         duration_ms = round((time.perf_counter() - start_time) * 1000, 2)
+        failed_data = {
+            "event": "request_failed",
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.url.path,
+            "duration_ms": duration_ms,
+        }
         logger.exception(
             "request_failed",
             extra={
-                "event": "request_failed",
-                "request_id": request_id,
-                "method": request.method,
-                "path": request.url.path,
-                "duration_ms": duration_ms,
+                **failed_data,
+                "structured_data": failed_data,
             },
         )
         raise
 
     duration_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
+    finished_data = {
+        "event": "request_finished",
+        "request_id": request_id,
+        "method": request.method,
+        "path": request.url.path,
+        "status_code": response.status_code,
+        "duration_ms": duration_ms,
+    }
+
     logger.info(
         "request_finished",
         extra={
-            "event": "request_finished",
-            "request_id": request_id,
-            "method": request.method,
-            "path": request.url.path,
-            "status_code": response.status_code,
-            "duration_ms": duration_ms,
+            **finished_data,
+            "structured_data": finished_data,
         },
     )
 

@@ -3,6 +3,8 @@ import logging
 import os
 from datetime import datetime, timezone
 
+from app.core.mongo_logger import MongoLogHandler
+
 
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
@@ -32,9 +34,6 @@ class JsonFormatter(logging.Formatter):
         if hasattr(record, "duration_ms"):
             log_record["duration_ms"] = record.duration_ms
 
-        if hasattr(record, "order_id"):
-            log_record["order_id"] = record.order_id
-
         if hasattr(record, "user_id"):
             log_record["user_id"] = record.user_id
 
@@ -51,10 +50,14 @@ class JsonFormatter(logging.Formatter):
 
 
 def setup_logging() -> None:
-    handler = logging.StreamHandler()
-    handler.setFormatter(JsonFormatter())
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(JsonFormatter())
 
     root_logger = logging.getLogger()
     root_logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
     root_logger.handlers.clear()
-    root_logger.addHandler(handler)
+    root_logger.addHandler(stream_handler)
+
+    mongo_handler = MongoLogHandler()
+    if mongo_handler.collection is not None:
+        root_logger.addHandler(mongo_handler)
