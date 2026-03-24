@@ -18,6 +18,7 @@ services:
     container_name: users-service
     environment:
       DATABASE_URL: postgresql://${USERS_DB_USER}:${USERS_DB_PASSWORD}@users-db:5432/users_db
+      MONGODB_URL: mongodb://logs-mongo:27017
       SECRET_KEY: ${SECRET_KEY}
       ALGORITHM: ${ALGORITHM}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
@@ -46,6 +47,7 @@ services:
     container_name: orders-service
     environment:
       DATABASE_URL: postgresql://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/orders_db
+      MONGODB_URL: mongodb://logs-mongo:27017
       SECRET_KEY: ${SECRET_KEY}
       ALGORITHM: ${ALGORITHM}
     ports:
@@ -57,7 +59,18 @@ services:
         condition: service_started
 
 # ========================
-# FRONTEND (NOVO)
+# OBSERVABILIDADE - LOGS
+# ========================
+  logs-mongo:
+    image: mongo:8
+    container_name: logs-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_logs_data:/data/db
+
+# ========================
+# FRONTEND
 # ========================
 
   shell:
@@ -89,5 +102,6 @@ services:
 volumes:
   users_data:
   orders_data:
+  mongo_logs_data:
   shell_node_modules:
   orders_mfe_node_modules:

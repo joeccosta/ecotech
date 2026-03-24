@@ -122,6 +122,7 @@ Authorization: Bearer <token>
 ### Infra
 - Docker
 - Docker Compose
+- MongoDB (logs estruturados)
 
 ---
 
@@ -212,6 +213,70 @@ docker compose exec orders-service pytest
 
 ---
 
+## 9.1 Logs Estruturados (MongoDB)
+
+O projeto implementa logs estruturados persistidos em MongoDB como camada complementar ao banco relacional.
+
+### Objetivo
+
+- registrar eventos de negócio e técnicos
+- permitir rastreabilidade de requisições
+- facilitar debugging e observabilidade
+
+### Arquitetura
+
+```
+[ orders-service ] ---> [ MongoDB (ecotech_logs.logs) ]
+```
+
+### Implementação
+
+- handler customizado (`mongo_logger.py`)
+- integração com o sistema de logging padrão do Python
+- inserção automática de documentos no MongoDB via `emit()`
+
+### Estrutura do log
+
+Exemplo de documento armazenado:
+
+```json
+{
+  "timestamp": "2026-03-24T15:50:00Z",
+  "level": "INFO",
+  "service": "orders-service",
+  "event": "orders_listed",
+  "message": "orders_listed",
+  "request_id": "uuid",
+  "status_filter": "pending",
+  "result_count": 120
+}
+```
+
+### Variáveis de ambiente
+
+```
+MONGO_URI=mongodb://logs-mongo:27017
+MONGO_DB_NAME=ecotech_logs
+```
+
+### Debug opcional
+
+Para inspecionar logs durante desenvolvimento:
+
+```
+DEBUG_MONGO_LOGGER=true
+```
+
+Isso imprime no console o documento antes da inserção.
+
+### Benefícios
+
+- separação entre dados transacionais e observabilidade
+- suporte a análise posterior (logs históricos)
+- base para evolução com tracing e métricas
+
+---
+
 ## 10. Próximos Passos
 
 - integração completa do login no frontend
@@ -225,11 +290,35 @@ docker compose exec orders-service pytest
 
 ## 11. Status do Projeto
 
-✔ Backend funcional (users + orders)
-✔ Autenticação JWT entre serviços
-✔ Testes automatizados passando
-✔ Integração via Postman validada
-✔ Ambiente dockerizado reproduzível
+### Entregas concluídas
+
+- backend funcional com `users-service` e `orders-service`
+- autenticação JWT entre serviços, com rotas protegidas e validação local do token
+- testes automatizados no backend cobrindo autenticação, validações e atualização de status
+- integração validada via Postman e frontend
+- ambiente dockerizado reproduzível com serviços isolados
+- persistência de logs estruturados no MongoDB para o `orders-service`
+
+### Funcionalidades já implementadas
+
+- criação, listagem e filtro de pedidos
+- atualização de status de pedidos
+- cadastro e login de usuários
+- propagação de autenticação entre microsserviços
+- logging estruturado no console e no MongoDB
+
+### Estado atual da arquitetura
+
+- microsserviços com bancos PostgreSQL separados
+- microfrontend `orders-mfe` integrado ao `orders-service`
+- shell com `single-spa` para orquestração do frontend
+- MongoDB como camada complementar de observabilidade
+
+### Próxima evolução natural
+
+- integrar completamente o fluxo de login ao frontend
+- replicar a persistência de logs estruturados no `users-service`
+- ampliar observabilidade com tracing e correlação entre serviços
 
 ---
 
