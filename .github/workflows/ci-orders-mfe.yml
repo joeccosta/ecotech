@@ -1,0 +1,42 @@
+name: CI orders-mfe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/orders-mfe/**"
+      - ".github/workflows/ci-orders-mfe.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "frontend/orders-mfe/**"
+      - ".github/workflows/ci-orders-mfe.yml"
+
+jobs:
+  build-orders-mfe:
+    name: Build orders-mfe
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend/orders-mfe
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/orders-mfe/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Show TypeScript version
+        run: npx tsc -v
+
+      - name: Build orders-mfe
+        run: npm run build

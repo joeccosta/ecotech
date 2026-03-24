@@ -1,6 +1,10 @@
 # Ecotech: Plataforma de Gestão de Pedidos de Vestuário Sustentável
 
-![CI](https://github.com/joeccosta/ecotech/actions/workflows/ci.yml/badge.svg?branch=main)
+![users-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-users.yml/badge.svg?branch=main)
+![orders-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders.yml/badge.svg?branch=main)
+![shell](https://github.com/joeccosta/ecotech/actions/workflows/ci-shell.yml/badge.svg?branch=main)
+![orders-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders-mfe.yml/badge.svg?branch=main)
+
 
 ## 1. Contexto
 
