@@ -17,6 +17,7 @@ def create_sample_order():
         "customer_name": "Joe Costa",
         "product": "Bermuda anti UV preta de corrida",
         "quantity": 2,
+        "price": 120.00,
     }
     response = client.post("/orders/", json=payload)
     assert response.status_code == 201, response.text
@@ -39,6 +40,7 @@ def test_update_order_status_success():
     assert data["customer_name"] == "Joe Costa"
     assert data["product"] == "Bermuda anti UV preta de corrida"
     assert data["quantity"] == 2
+    assert data["price"] == 120.00
 
 
 def test_update_order_status_not_found():

@@ -23,6 +23,7 @@ def create_order(
         customer_name=payload.customer_name,
         product=payload.product,
         quantity=payload.quantity,
+        price=payload.price,
     )
     db.add(order)
     db.commit()
@@ -35,6 +36,7 @@ def create_order(
             "order_id": order.id,
             "customer_name": order.customer_name,
             "status": order.status,
+            "price": order.price,
         },
     )
     return order
