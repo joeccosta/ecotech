@@ -18,6 +18,9 @@ services:
     container_name: users-service
     environment:
       DATABASE_URL: postgresql://${USERS_DB_USER}:${USERS_DB_PASSWORD}@users-db:5432/users_db
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
     ports:
       - "8001:8000"
     volumes:
@@ -43,6 +46,8 @@ services:
     container_name: orders-service
     environment:
       DATABASE_URL: postgresql://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/orders_db
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM}
     ports:
       - "8002:8000"
     volumes:

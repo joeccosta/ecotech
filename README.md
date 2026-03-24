@@ -1,24 +1,19 @@
-# Ecotech: Plataforma de Gestão de Pedidos de vestuário Ecofriendly
+# Ecotech: Plataforma de Gestão de Pedidos de Vestuário Sustentável
 
-## 1. Contexto do Problema
+## 1. Contexto
 
-Uma empresa de e-commerce de vestuário esportivo sustentável (Ecotech) enfrenta dificuldades operacionais ao gerenciar pedidos por meio de planilhas.
+A Ecotech é uma empresa de e-commerce focada em vestuário esportivo sustentável. O processo atual de gestão de pedidos baseado em planilhas apresenta limitações como:
 
-Esse processo apresenta limitações importantes:
 - ausência de atualização em tempo real
-- alta propensão a erros manuais
-- dificuldade de rastreamento do status dos pedidos
+- erros manuais frequentes
+- dificuldade de rastreamento de pedidos
 - baixa escalabilidade
 
-Este projeto propõe um Produto Mínimo Viável (PMV) para resolver esse problema utilizando uma arquitetura moderna baseada em **microsserviços** no backend e **microfrontends** no frontend.
+Este projeto propõe um **Produto Mínimo Viável (PMV)** utilizando uma arquitetura moderna com **microsserviços** e **microfrontends**.
 
 ---
 
-## 2. Arquitetura da Solução
-
-A solução foi projetada com separação clara de responsabilidades e baixo acoplamento entre componentes.
-
-### 2.1 Visão Geral
+## 2. Arquitetura
 
 ```
 [ Shell (single-spa) :9000 ]
@@ -30,52 +25,88 @@ A solução foi projetada com separação clara de responsabilidades e baixo aco
 [ users-service  :8001 ] ----> [ PostgreSQL users_db ]
 ```
 
+### Princípios adotados
+
+- baixo acoplamento entre serviços
+- separação de responsabilidades
+- escalabilidade independente
+
 ---
 
-## 3. Backend (Microsserviços)
+## 3. Backend
 
-A aplicação backend é composta por serviços independentes, cada um responsável por um domínio específico.
+### 3.1 users-service
+Responsável por autenticação e usuários:
 
-### 3.1 orders-service
-Responsável pela gestão de pedidos:
-- criação de pedidos
-- listagem de pedidos
-- filtro por status
-- atualização de status
-
-### 3.2 users-service
-Responsável pela gestão de usuários:
 - criação de usuários
-- listagem de usuários
-- consulta por ID
+- login (JWT)
+- validação de credenciais
 
-### 3.3 Persistência
-Cada serviço possui seu próprio banco de dados PostgreSQL:
-- isolamento de dados
-- independência entre serviços
-- alinhamento com boas práticas de microsserviços
+### 3.2 orders-service
+Responsável por pedidos:
 
----
-
-## 4. Frontend (Microfrontends)
-
-O frontend utiliza arquitetura de microfrontends com **single-spa**.
-
-### 4.1 Shell (Root Config)
-- responsável por orquestrar os MFEs
-- gerencia rotas e composição
-- não contém lógica de negócio
-
-### 4.2 orders-mfe
-- listagem de pedidos
-- filtro por status
 - criação de pedidos
+- listagem
+- filtro por status
 - atualização de status
-- integração direta com o orders-service
+- rotas protegidas por JWT
+
+### 3.3 Banco de Dados
+
+Cada serviço possui seu próprio banco PostgreSQL:
+
+- isolamento de dados
+- independência de deploy
 
 ---
 
-## 5. Tecnologias Utilizadas
+## 4. Frontend
+
+Arquitetura baseada em **microfrontends com single-spa**.
+
+### Shell
+- orquestra os MFEs
+- gerencia rotas
+
+### orders-mfe
+- criação de pedidos
+- listagem
+- atualização de status
+- integração com orders-service
+
+---
+
+## 5. Autenticação (JWT)
+
+### Fluxo
+
+1. Login no `users-service`
+2. Geração de JWT com:
+   - `sub` (email do usuário)
+   - `exp` (expiração)
+3. Envio do token ao cliente
+
+### Uso
+
+```
+Authorization: Bearer <token>
+```
+
+### Validação
+
+- feita localmente em cada serviço
+- não há chamada entre serviços
+- depende de `SECRET_KEY` compartilhada
+
+### Benefícios
+
+- stateless
+- escalável
+- desacoplado
+
+---
+
+## 6. Tecnologias
 
 ### Backend
 - FastAPI
@@ -85,158 +116,89 @@ O frontend utiliza arquitetura de microfrontends com **single-spa**.
 
 ### Frontend
 - React
-- single-spa
 - TypeScript
+- single-spa
 
-### Infraestrutura
+### Infra
 - Docker
 - Docker Compose
 
 ---
 
-## 6. Como Executar o Projeto
-
-Na raiz do projeto:
+## 7. Execução
 
 ```bash
 docker compose up --build
 ```
 
-### Acessos
+### Endpoints
 
-- Shell (frontend): http://localhost:9000
-- Orders API (docs): http://localhost:8002/docs
-- Users API (docs): http://localhost:8001/docs
-
----
-
-## 7. Funcionalidades Implementadas
-
-- Criação de pedidos
-- Listagem de pedidos
-- Filtro por status
-- Atualização de status
-- Criação e listagem de usuários
-- Testes automatizados no backend
-- Autenticação JWT compartilhada
+- Frontend: http://localhost:9000
+- Users API: http://localhost:8001/docs
+- Orders API: http://localhost:8002/docs
 
 ---
 
-## 8. Decisões Técnicas
+## 8. Testes
+
+Executar:
+
+```bash
+docker compose exec users-service pytest
+docker compose exec orders-service pytest
+```
+
+### Cobertura atual
+
+- autenticação (login, token válido/inválido)
+- rotas protegidas (401)
+- criação de pedidos (201)
+- validação de payload (422)
+- atualização de status
+
+---
+
+## 9. Decisões Técnicas
+
+### JWT compartilhado
+- simplicidade para MVP
+- evita chamada entre serviços
+
+### Bancos separados
+- isolamento
+- resiliência
 
 ### FastAPI
-Escolhido por:
-- rapidez no desenvolvimento
-- tipagem forte com Pydantic
-- documentação automática via Swagger
+- produtividade
+- tipagem forte
 
-### Microfrontends com single-spa
-- composição em runtime
-- independência entre equipes
-- possibilidade de deploy isolado
-
-### Bancos separados por serviço
-- evita acoplamento
-- aumenta a resiliência
-- permite evolução independente
-
-### Docker Compose
-- simplifica execução local
-- reproduz ambiente completo com um único comando
+### Microfrontends
+- deploy independente
+- escalabilidade de equipes
 
 ---
 
-## 9. Qualidade e Testes
+## 10. Próximos Passos
 
-- Testes automatizados com Pytest
-- Cobertura dos principais endpoints do orders-service
-- Validação de cenários de erro (status inválido, recurso inexistente)
-- Comportamento: 
-	•	validação de token funcionando (401 para ausência/invalidez)
-	•	testes cobrindo:
-	•	fluxo feliz (201)
-	•	validação de payload (422)
-	•	ausência de token (401)
-	•	token inválido (401)
-
----
-
-## 10. Próximos Passos (Evoluções Possíveis)
-
+- integração completa do login no frontend
 - API Gateway / BFF
-- Comunicação assíncrona (RabbitMQ ou Kafka)
-- Observabilidade (logs estruturados, tracing)
-- Cache com Redis
-- Testes no frontend
+- logs estruturados
+- observabilidade (tracing)
+- uso de chave pública (RS256)
+- testes no frontend
 
 ---
 
-## 11. Autenticação e Autorização (JWT)
+## 11. Status do Projeto
 
-A aplicação utiliza autenticação baseada em **JSON Web Tokens (JWT)** para garantir segurança entre os microsserviços.
-
-### 11.1 Fluxo de Autenticação
-
-1. O cliente realiza login no `users-service` enviando email e senha.
-2. O `users-service` valida as credenciais.
-3. Em caso de sucesso, um JWT é gerado contendo:
-   - `sub`: identificação do usuário (email)
-   - `exp`: tempo de expiração
-4. O token é retornado ao cliente.
-
-### 11.2 Uso do Token
-
-O cliente deve incluir o token nas requisições subsequentes:
-
-```
-Authorization: Bearer <access_token>
-```
-
-### 11.3 Validação entre Microsserviços
-
-Os serviços (como o `orders-service`) **não consultam o `users-service` para validar o token**.
-
-A validação é feita localmente por cada serviço:
-- decodificação do JWT
-- verificação da assinatura
-- verificação de expiração
-
-Isso é possível porque todos os serviços compartilham a mesma `SECRET_KEY`.
-
-### 11.4 Proteção de Rotas
-
-Rotas protegidas utilizam dependências do FastAPI, como:
-
-```python
-@router.get("/secure")
-def secure_route(user=Depends(get_current_user)):
-    return {"user_id": user}
-```
-
-A função `get_current_user`:
-- extrai o token do header
-- valida o JWT
-- retorna o usuário autenticado ou erro 401
-
-### 11.5 Características da Abordagem
-
-- Stateless: não há armazenamento de sessão no servidor
-- Escalável: não requer comunicação entre serviços para autenticação
-- Desacoplado: cada serviço valida o token de forma independente
-
-### 11.6 Limitações e Evoluções Futuras
-
-A abordagem atual utiliza uma chave secreta compartilhada (`SECRET_KEY`), o que pode gerar acoplamento entre serviços.
-
-Evoluções possíveis:
-- Uso de chave pública/privada (RS256)
-- Adoção de um provedor de identidade (ex: Keycloak, Auth0)
-- Introdução de API Gateway para centralizar autenticação
+✔ Backend funcional (users + orders)
+✔ Autenticação JWT entre serviços
+✔ Testes automatizados passando
+✔ Integração via Postman validada
+✔ Ambiente dockerizado reproduzível
 
 ---
 
-## 12. Considerações Finais
+## 12. Conclusão
 
-Este projeto demonstra a construção de um sistema distribuído com separação clara de responsabilidades, integração entre frontend e backend e uso de práticas modernas de desenvolvimento.
-
-O foco foi a entrega de um PMV funcional, priorizando clareza arquitetural, simplicidade e capacidade de evolução.
+O projeto demonstra a implementação de uma arquitetura distribuída moderna com autenticação segura, testes automatizados e separação clara de responsabilidades, servindo como base sólida para evolução.
