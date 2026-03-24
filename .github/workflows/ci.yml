@@ -104,3 +104,53 @@ jobs:
 
       - name: Run tests
         run: pytest -q
+
+  build-shell:
+    name: Build shell
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend/shell
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/shell/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shell
+        run: npm run build
+
+  build-orders-mfe:
+    name: Build orders-mfe
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend/orders-mfe
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/orders-mfe/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build orders-mfe
+        run: npm run build
