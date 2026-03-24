@@ -11,6 +11,16 @@ import { registerApplication, start, LifeCycles } from "single-spa";
 // });
 
 registerApplication({
+  name: "@ecotech/login-mfe",
+  app: () =>
+    import(
+      /* webpackIgnore: true */ // @ts-ignore-next
+      "@ecotech/login-mfe"
+    ),
+  activeWhen: (location) => location.pathname === "/",
+});
+
+registerApplication({
   name: "@ecotech/orders-mfe",
   app: () =>
     import(

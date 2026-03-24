@@ -4,6 +4,7 @@
 ![orders-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders.yml/badge.svg?branch=main)
 ![shell](https://github.com/joeccosta/ecotech/actions/workflows/ci-shell.yml/badge.svg?branch=main)
 ![orders-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders-mfe.yml/badge.svg?branch=main)
+![orders-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-login-mfe.yml/badge.svg?branch=main)
 
 
 ## 1. Contexto
