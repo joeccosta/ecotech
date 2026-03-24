@@ -27,7 +27,11 @@ def create_order(
 
 
 @router.get("/", response_model=list[OrderResponse])
-def list_orders(status: str | None = None, db: Session = Depends(get_db)):
+def list_orders(
+    status: str | None = None,
+    db: Session = Depends(get_db),
+    _current_user: str = Depends(get_current_user),
+):
     query = db.query(Order)
 
     if status:
@@ -37,7 +41,11 @@ def list_orders(status: str | None = None, db: Session = Depends(get_db)):
 
 
 @router.get("/{order_id}", response_model=OrderResponse)
-def get_order(order_id: int, db: Session = Depends(get_db)):
+def get_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    _current_user: str = Depends(get_current_user),
+):
     order = db.query(Order).filter(Order.id == order_id).first()
 
     if not order:

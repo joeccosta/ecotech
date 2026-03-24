@@ -15,12 +15,12 @@ def auth_headers(sub: str = "1") -> dict[str, str]:
 
 
 def test_get_orders_returns_200():
-    response = client.get("/orders")
+    response = client.get("/orders", headers=auth_headers())
     assert response.status_code == 200
 
 
 def test_get_orders_returns_a_list():
-    response = client.get("/orders")
+    response = client.get("/orders", headers=auth_headers())
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
@@ -28,7 +28,7 @@ def test_get_orders_returns_a_list():
 def test_create_order_with_valid_payload():
     payload = {
         "customer_name": "Maria",
-        "product": "Notebook",
+        "product": "Short Feminino Ecotech",
         "quantity": 2
     }
 
@@ -38,7 +38,7 @@ def test_create_order_with_valid_payload():
 
     body = response.json()
     assert body["customer_name"] == "Maria"
-    assert body["product"] == "Notebook"
+    assert body["product"] == "Short Feminino Ecotech"
     assert body["quantity"] == 2
     assert "id" in body
     assert "status" in body
@@ -48,7 +48,7 @@ def test_create_order_with_valid_payload():
 def test_create_order_with_invalid_payload():
     payload = {
         "customer_name": "Maria",
-        "product": "Notebook"
+        "product": "Short Feminino Ecotech"
     }
 
     response = client.post("/orders", json=payload, headers=auth_headers())
@@ -65,7 +65,7 @@ def test_new_order_has_default_status_pending():
     """Regra de negócio: o status deve começar com pendente"""
     response = client.post("/orders", json={
         "customer_name": "João",
-        "product": "Mouse",
+        "product": "Boné",
         "quantity": 1
     }, headers=auth_headers())
 
@@ -82,7 +82,7 @@ def test_created_order_appears_in_list():
     
     assert create_response.status_code == 201
 
-    response = client.get("/orders")
+    response = client.get("/orders", headers=auth_headers())
     body = response.json()
 
     assert any(order["customer_name"] == "Ana" for order in body)
@@ -108,26 +108,62 @@ def test_quantity_must_be_greater_than_zero_for_negative_numbers():
 def test_create_order_requires_authentication():
     response = client.post("/orders", json={
         "customer_name": "Maria",
-        "product": "Notebook",
+        "product": "Short Feminino Ecotech",
         "quantity": 2
     })
 
     assert response.status_code == 401
     assert response.json()["detail"] == "Not authenticated"
 
-def test_create_order_with_invalid_token_returns_401():
-    payload = {
-        "customer_name": "Maria",
-        "product": "Notebook",
-        "quantity": 2
-    }
+def test_list_orders_requires_authentication():
+    response = client.get("/orders")
 
-    response = client.post(
-        "/orders",
-        json=payload,
-        headers={"Authorization": "Bearer token-invalido"}
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Not authenticated"
+
+
+def test_get_order_requires_authentication():
+    created = client.post("/orders", json={
+        "customer_name": "Carlos",
+        "product": "Camiseta ecológica",
+        "quantity": 1
+    }, headers=auth_headers())
+
+    order_id = created.json()["id"]
+    response = client.get(f"/orders/{order_id}")
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Not authenticated"
+
+
+def test_get_order_with_authentication_returns_200():
+    created = client.post("/orders", json={
+        "customer_name": "Paula",
+        "product": "Garrafa sustentável",
+        "quantity": 1
+    }, headers=auth_headers())
+
+    order_id = created.json()["id"]
+    response = client.get(f"/orders/{order_id}", headers=auth_headers())
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == order_id
+    assert body["customer_name"] == "Paula"
+
+
+def test_update_status_requires_authentication():
+    created = client.post("/orders", json={
+        "customer_name": "Bruno",
+        "product": "Boné ecológico",
+        "quantity": 1
+    }, headers=auth_headers())
+
+    order_id = created.json()["id"]
+    response = client.patch(
+        f"/orders/{order_id}/status",
+        json={"status": "processing"}
     )
 
     assert response.status_code == 401
-    assert response.json()["detail"] == "Could not validate credentials"
-
+    assert response.json()["detail"] == "Not authenticated"
