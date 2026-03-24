@@ -10,7 +10,7 @@ class JsonFormatter(logging.Formatter):
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "level": record.levelname,
             "logger": record.name,
-            "service": os.getenv("SERVICE_NAME", "orders-service"),
+            "service": os.getenv("SERVICE_NAME", "users-service"),
             "message": record.getMessage(),
         }
 
@@ -37,6 +37,15 @@ class JsonFormatter(logging.Formatter):
 
         if hasattr(record, "user_id"):
             log_record["user_id"] = record.user_id
+
+        if hasattr(record, "email"):
+            log_record["email"] = record.email
+
+        if hasattr(record, "user_name"):
+            log_record["user_name"] = record.user_name
+
+        if hasattr(record, "result_count"):
+            log_record["result_count"] = record.result_count
 
         return json.dumps(log_record, ensure_ascii=False)
 
