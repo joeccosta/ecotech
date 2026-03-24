@@ -1,5 +1,7 @@
 # Ecotech: Plataforma de Gestão de Pedidos de Vestuário Sustentável
 
+![CI](https://github.com/joeccosta/ecotech/actions/workflows/ci.yml/badge.svg?branch=main)
+
 ## 1. Contexto
 
 A Ecotech é uma empresa de e-commerce focada em vestuário esportivo sustentável. O processo atual de gestão de pedidos baseado em planilhas apresenta limitações como:
@@ -193,6 +195,28 @@ docker compose exec orders-service pytest
 
 ---
 
+## 8.1 Integração Contínua (CI)
+
+O projeto utiliza GitHub Actions para execução automática de testes a cada `push` ou `pull request` na branch principal.
+
+### Pipeline
+
+- execução de testes do `users-service`
+- execução de testes do `orders-service`
+- validação do ambiente via Docker
+
+### Benefícios
+
+- garantia de integridade do código a cada alteração
+- detecção precoce de falhas
+- padronização do processo de build e teste
+
+### Status
+
+O status da pipeline pode ser acompanhado pelo badge no topo deste documento.
+
+---
+
 ## 9. Decisões Técnicas
 
 ### JWT compartilhado
@@ -298,6 +322,7 @@ Isso imprime no console o documento antes da inserção.
 - integração validada via Postman e frontend
 - ambiente dockerizado reproduzível com serviços isolados
 - persistência de logs estruturados no MongoDB para o `orders-service`
+- pipeline de CI com GitHub Actions validando automaticamente os testes dos microsserviços
 
 ### Funcionalidades já implementadas
 
