@@ -4,7 +4,7 @@
 ![orders-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders.yml/badge.svg?branch=main)
 ![shell](https://github.com/joeccosta/ecotech/actions/workflows/ci-shell.yml/badge.svg?branch=main)
 ![orders-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders-mfe.yml/badge.svg?branch=main)
-![orders-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-login-mfe.yml/badge.svg?branch=main)
+![login-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-login-mfe.yml/badge.svg?branch=main)
 
 
 ## 1. Contexto
@@ -23,12 +23,18 @@ Este projeto propõe um **Produto Mínimo Viável (PMV)** utilizando uma arquite
 ## 2. Arquitetura
 
 ```
+[ login-mfe :8501 ]
+        |
+        ↓
 [ Shell (single-spa) :9000 ]
         |
         |--- orders-mfe :8500
         |
         ↓
 [ orders-service :8002 ] ----> [ PostgreSQL orders_db ]
+        |
+        └-------------------> [ MongoDB ecotech_logs ]
+        |
 [ users-service  :8001 ] ----> [ PostgreSQL users_db ]
 ```
 
@@ -110,6 +116,30 @@ Authorization: Bearer <token>
 - stateless
 - escalável
 - desacoplado
+
+### 5.1 Autenticação no Frontend (Microfrontends)
+
+Além da validação no backend, o frontend implementa **controle de acesso por token (JWT)** para impedir navegação direta às rotas dos microfrontends.
+
+#### Estratégia adotada
+
+- o token JWT é armazenado no `localStorage` após login
+- cada MFE verifica localmente se o usuário está autenticado
+- em caso negativo, ocorre redirecionamento para o `login-mfe`
+
+#### Proteções implementadas
+
+- bloqueio de acesso direto ao `shell` (`:9000`)
+- bloqueio de acesso direto ao `orders-mfe` (`:8500`)
+- redirecionamento automático para login quando não autenticado
+- redirecionamento para o shell quando o usuário já está autenticado
+
+#### Responsabilidade por camada
+
+- **Frontend (MFE):** controle de navegação e experiência do usuário
+- **Backend (services):** validação real de segurança via JWT (401 Unauthorized)
+
+Essa abordagem segue o princípio de **defesa em profundidade**, combinando validação visual no frontend com proteção efetiva no backend.
 
 ---
 
@@ -308,6 +338,12 @@ Isso imprime no console o documento antes da inserção.
 
 ## 10. Próximos Passos
 
+- centralizar autenticação em um módulo compartilhado entre MFEs
+- implementar ProtectedRoute reutilizável
+- adicionar logout global no shell com contexto de usuário
+- persistir informações do usuário (ex: nome) no frontend
+- implementar refresh token e controle de expiração
+- considerar uso de armazenamento seguro (ex: httpOnly cookies)
 - integração completa do login no frontend
 - API Gateway / BFF
 - logs estruturados
@@ -336,6 +372,7 @@ Isso imprime no console o documento antes da inserção.
 - cadastro e login de usuários
 - propagação de autenticação entre microsserviços
 - logging estruturado no console e no MongoDB
+- proteção de rotas no frontend com verificação de autenticação (JWT) e redirecionamento automático
 
 ### Estado atual da arquitetura
 
