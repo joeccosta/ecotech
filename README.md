@@ -61,6 +61,7 @@ Responsável por pedidos:
 - criação de pedidos
 - listagem
 - filtro por status
+- filtro por ID do pedido (query param `order_id`)
 - atualização de status
 - rotas protegidas por JWT
 
@@ -84,6 +85,7 @@ Arquitetura baseada em **microfrontends com single-spa**.
 ### orders-mfe
 - criação de pedidos
 - listagem
+- filtros por status e ID do pedido
 - atualização de status
 - integração com orders-service
 
@@ -317,6 +319,7 @@ Exemplo de documento armazenado:
   "message": "orders_listed",
   "request_id": "uuid",
   "status_filter": "pending",
+  "order_id_filter": 12,
   "result_count": 120
 }
 ```
@@ -377,7 +380,7 @@ Isso imprime no console o documento antes da inserção.
 
 ### Funcionalidades já implementadas
 
-- criação, listagem e filtro de pedidos
+- criação, listagem e filtros de pedidos (status e ID)
 - atualização de status de pedidos
 - cadastro e login de usuários
 - propagação de autenticação entre microsserviços
