@@ -7,15 +7,16 @@ import { createOrder, fetchOrders, Order } from "./api/orders";
 export default function Root() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [statusFilter, setStatusFilter] = useState("");
+  const [orderIdFilter, setOrderIdFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const token = localStorage.getItem("ecotech_token");
 
-  async function loadOrders(status?: string) {
+  async function loadOrders(filters?: { status?: string; orderId?: number }) {
     try {
       setLoading(true);
       setError("");
-      const data = await fetchOrders(status);
+      const data = await fetchOrders(filters);
       setOrders(data.sort((a, b) => b.id - a.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao carregar pedidos.");
@@ -36,7 +37,10 @@ export default function Root() {
 
       alert("Pedido criado com sucesso!");
 
-      await loadOrders(statusFilter || undefined);
+      await loadOrders({
+        status: statusFilter || undefined,
+        orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao criar pedido.");
     }
@@ -48,30 +52,58 @@ export default function Root() {
       return;
     }
 
-    loadOrders();
+    loadOrders({
+      status: statusFilter || undefined,
+      orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+    });
   }, [token]);
 
   return (
     <div style={{ padding: "24px" }}>
       <h1>Ecotech Orders MFE</h1>
 
-      <div style={{ marginBottom: "16px" }}>
-        <label>Filtrar por status: </label>
-        <select
-          value={statusFilter}
-          onChange={(e) => {
-            const value = e.target.value;
-            setStatusFilter(value);
-            loadOrders(value || undefined);
-          }}
-        >
-          <option value="">Todos</option>
-          <option value="pending">pending</option>
-          <option value="processing">processing</option>
-          <option value="shipped">shipped</option>
-          <option value="delivered">delivered</option>
-          <option value="cancelled">cancelled</option>
-        </select>
+      <div style={{ marginBottom: "16px", display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
+        <div>
+          <label htmlFor="status-filter">Filtrar por status: </label>
+          <select
+            id="status-filter"
+            value={statusFilter}
+            onChange={(e) => {
+              const value = e.target.value;
+              setStatusFilter(value);
+              loadOrders({
+                status: value || undefined,
+                orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+              });
+            }}
+          >
+            <option value="">Todos</option>
+            <option value="pending">pending</option>
+            <option value="processing">processing</option>
+            <option value="shipped">shipped</option>
+            <option value="delivered">delivered</option>
+            <option value="cancelled">cancelled</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="order-id-filter">Filtrar por ID: </label>
+          <input
+            id="order-id-filter"
+            type="number"
+            min="1"
+            value={orderIdFilter}
+            onChange={(e) => {
+              const value = e.target.value;
+              setOrderIdFilter(value);
+              loadOrders({
+                status: statusFilter || undefined,
+                orderId: value ? Number(value) : undefined,
+              });
+            }}
+            placeholder="Ex.: 12"
+          />
+        </div>
       </div>
 
       {loading && <p>Carregando pedidos...</p>}
@@ -81,7 +113,12 @@ export default function Root() {
       <hr />
       <OrderList
         orders={orders}
-        onStatusUpdated={() => loadOrders(statusFilter || undefined)}
+        onStatusUpdated={() =>
+          loadOrders({
+            status: statusFilter || undefined,
+            orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+          })
+        }
       />
     </div>
   );

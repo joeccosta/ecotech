@@ -45,10 +45,14 @@ def create_order(
 @router.get("/", response_model=list[OrderResponse])
 def list_orders(
     status: str | None = None,
+    order_id: int | None = None,
     db: Session = Depends(get_db),
     _current_user: str = Depends(get_current_user),
 ):
     query = db.query(Order)
+
+    if order_id is not None:
+        query = query.filter(Order.id == order_id)
 
     if status:
         query = query.filter(Order.status == status)
@@ -60,6 +64,7 @@ def list_orders(
         extra={
             "event": "orders_listed",
             "status_filter": status,
+            "order_id_filter": order_id,
             "result_count": len(orders),
         },
     )

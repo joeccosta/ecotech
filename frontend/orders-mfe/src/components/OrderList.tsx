@@ -14,6 +14,12 @@ export default function OrderList({ orders, onStatusUpdated }: Props) {
     setLocalOrders(orders);
   }, [orders]);
 
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+
   const handleStatusChange = async (orderId: number, newStatus: string) => {
     try {
       const updatedOrder = await updateOrderStatus(orderId, newStatus);
@@ -40,27 +46,43 @@ export default function OrderList({ orders, onStatusUpdated }: Props) {
       {localOrders.length === 0 ? (
         <p>Nenhum pedido encontrado.</p>
       ) : (
-        <ul>
-          {localOrders.map((order) => (
-            <li key={order.id}>
-              <strong>#{order.id}</strong> — {order.customer_name} | {order.product} | qtd:{" "}
-              {order.quantity} |{" "}
-              <label>
-                status:{" "}
-                <select
-                  value={order.status}
-                  onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                >
-                  <option value="pending">pending</option>
-                  <option value="processing">processing</option>
-                  <option value="shipped">shipped</option>
-                  <option value="delivered">delivered</option>
-                  <option value="cancelled">cancelled</option>
-                </select>
-              </label>
-            </li>
-          ))}
-        </ul>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left" }}>ID</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left" }}>Cliente</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left" }}>Produto</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left" }}>Qtd</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left" }}>Preço</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left" }}>Total</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left" }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {localOrders.map((order) => (
+              <tr key={order.id}>
+                <td>#{order.id}</td>
+                <td>{order.customer_name}</td>
+                <td>{order.product}</td>
+                <td>{order.quantity}</td>
+                <td>{formatCurrency(order.price)}</td>
+                <td>{formatCurrency(order.quantity * order.price)}</td>
+                <td>
+                  <select
+                    value={order.status}
+                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                  >
+                    <option value="pending">pending</option>
+                    <option value="processing">processing</option>
+                    <option value="shipped">shipped</option>
+                    <option value="delivered">delivered</option>
+                    <option value="cancelled">cancelled</option>
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

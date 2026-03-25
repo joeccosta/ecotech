@@ -22,8 +22,19 @@ function getAuthHeaders(contentType: string = "application/json") {
   };
 }
 
-export async function fetchOrders(status?: string): Promise<Order[]> {
-  const url = status ? `${BASE_URL}/?status=${status}` : `${BASE_URL}/`;
+export async function fetchOrders(filters?: { status?: string; orderId?: number }): Promise<Order[]> {
+  const params = new URLSearchParams();
+
+  if (filters?.status) {
+    params.append("status", filters.status);
+  }
+
+  if (filters?.orderId !== undefined) {
+    params.append("order_id", String(filters.orderId));
+  }
+
+  const queryString = params.toString();
+  const url = queryString ? `${BASE_URL}/?${queryString}` : `${BASE_URL}/`;
   const response = await fetch(url, {
     headers: getAuthHeaders(),
   });
