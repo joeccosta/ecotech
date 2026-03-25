@@ -4,6 +4,7 @@ type Props = {
   onCreate: (payload: {
     customer_name: string;
     product: string;
+    price: number;
     quantity: number;
   }) => Promise<void>;
 };
@@ -11,6 +12,7 @@ type Props = {
 export default function OrderForm({ onCreate }: Props) {
   const [customerName, setCustomerName] = useState("");
   const [product, setProduct] = useState("");
+  const [price, setPrice] = useState(1);
   const [quantity, setQuantity] = useState(1);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -19,11 +21,13 @@ export default function OrderForm({ onCreate }: Props) {
     await onCreate({
       customer_name: customerName,
       product,
+      price,
       quantity,
     });
 
     setCustomerName("");
     setProduct("");
+    setPrice(1);
     setQuantity(1);
   }
 
@@ -47,6 +51,19 @@ export default function OrderForm({ onCreate }: Props) {
         <input
           value={product}
           onChange={(e) => setProduct(e.target.value)}
+          required
+        />
+      </div>
+
+      <div>
+        <label>Preço</label>
+        <br />
+        <input
+          type="number"
+          min={0}
+          step={0.01}
+          value={price}
+          onChange={(e) => setPrice(Number(e.target.value))}
           required
         />
       </div>

@@ -9,6 +9,7 @@ export default function Root() {
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const token = localStorage.getItem("ecotech_token");
 
   async function loadOrders(status?: string) {
     try {
@@ -26,6 +27,7 @@ export default function Root() {
   async function handleCreate(payload: {
     customer_name: string;
     product: string;
+    price: number;
     quantity: number;
   }) {
     try {
@@ -41,8 +43,13 @@ export default function Root() {
   }
 
   useEffect(() => {
+    if (!token) {
+      window.location.href = "http://localhost:9000/login";
+      return;
+    }
+
     loadOrders();
-  }, []);
+  }, [token]);
 
   return (
     <div style={{ padding: "24px" }}>

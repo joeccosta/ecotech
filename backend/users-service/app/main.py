@@ -2,6 +2,7 @@ import logging
 import time
 import uuid
 
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request
 
 from app.core.logging_config import setup_logging
@@ -15,6 +16,17 @@ logger = logging.getLogger("users-service")
 
 app = FastAPI(title="Users Service", version="1.0.0")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:9000",
+        "http://localhost:8500",
+        "http://localhost:8501",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):

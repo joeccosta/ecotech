@@ -17,7 +17,7 @@ registerApplication({
       /* webpackIgnore: true */ // @ts-ignore-next
       "@ecotech/login-mfe"
     ),
-  activeWhen: (location) => location.pathname === "/",
+  activeWhen: (location) => location.pathname === "/login",
 });
 
 registerApplication({
