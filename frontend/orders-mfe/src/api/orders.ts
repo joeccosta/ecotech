@@ -22,7 +22,7 @@ function getAuthHeaders(contentType: string = "application/json") {
   };
 }
 
-export async function fetchOrders(filters?: { status?: string; orderId?: number }): Promise<Order[]> {
+export async function fetchOrders(filters?: { status?: string; orderId?: number; customerName?: string }): Promise<Order[]> {
   const params = new URLSearchParams();
 
   if (filters?.status) {
@@ -31,6 +31,10 @@ export async function fetchOrders(filters?: { status?: string; orderId?: number 
 
   if (filters?.orderId !== undefined) {
     params.append("order_id", String(filters.orderId));
+  }
+
+  if (filters?.customerName) {
+    params.append("customer_name", filters.customerName);
   }
 
   const queryString = params.toString();

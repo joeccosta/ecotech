@@ -46,6 +46,7 @@ def create_order(
 def list_orders(
     status: str | None = None,
     order_id: int | None = None,
+    customer_name: str | None = None,
     db: Session = Depends(get_db),
     _current_user: str = Depends(get_current_user),
 ):
@@ -53,6 +54,9 @@ def list_orders(
 
     if order_id is not None:
         query = query.filter(Order.id == order_id)
+
+    if customer_name:
+        query = query.filter(Order.customer_name.ilike(f"%{customer_name}%"))
 
     if status:
         query = query.filter(Order.status == status)
@@ -65,6 +69,7 @@ def list_orders(
             "event": "orders_listed",
             "status_filter": status,
             "order_id_filter": order_id,
+            "customer_name_filter": customer_name,
             "result_count": len(orders),
         },
     )

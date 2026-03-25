@@ -8,11 +8,12 @@ export default function Root() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [orderIdFilter, setOrderIdFilter] = useState("");
+  const [customerNameFilter, setCustomerNameFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const token = localStorage.getItem("ecotech_token");
 
-  async function loadOrders(filters?: { status?: string; orderId?: number }) {
+  async function loadOrders(filters?: { status?: string; orderId?: number; customerName?: string }) {
     try {
       setLoading(true);
       setError("");
@@ -40,6 +41,7 @@ export default function Root() {
       await loadOrders({
         status: statusFilter || undefined,
         orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+        customerName: customerNameFilter || undefined,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao criar pedido.");
@@ -55,6 +57,7 @@ export default function Root() {
     loadOrders({
       status: statusFilter || undefined,
       orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+      customerName: customerNameFilter || undefined,
     });
   }, [token]);
 
@@ -74,6 +77,7 @@ export default function Root() {
               loadOrders({
                 status: value || undefined,
                 orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+                customerName: customerNameFilter || undefined,
               });
             }}
           >
@@ -99,9 +103,29 @@ export default function Root() {
               loadOrders({
                 status: statusFilter || undefined,
                 orderId: value ? Number(value) : undefined,
+                customerName: customerNameFilter || undefined,
               });
             }}
             placeholder="Ex.: 12"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="customer-name-filter">Filtrar por cliente: </label>
+          <input
+            id="customer-name-filter"
+            type="text"
+            value={customerNameFilter}
+            onChange={(e) => {
+              const value = e.target.value;
+              setCustomerNameFilter(value);
+              loadOrders({
+                status: statusFilter || undefined,
+                orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+                customerName: value || undefined,
+              });
+            }}
+            placeholder="Ex.: Maria"
           />
         </div>
       </div>
@@ -117,6 +141,7 @@ export default function Root() {
           loadOrders({
             status: statusFilter || undefined,
             orderId: orderIdFilter ? Number(orderIdFilter) : undefined,
+            customerName: customerNameFilter || undefined,
           })
         }
       />
