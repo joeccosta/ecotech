@@ -129,7 +129,7 @@ Além da validação no backend, o frontend implementa **controle de acesso por 
 
 #### Proteções implementadas
 
-- bloqueio de acesso direto ao `shell` (`:9000`)
+- bloqueio de acesso direto ao `shell` (`:9000`) (pendente)
 - bloqueio de acesso direto ao `orders-mfe` (`:8500`)
 - redirecionamento automático para login quando não autenticado
 - redirecionamento para o shell quando o usuário já está autenticado
@@ -225,8 +225,10 @@ docker compose exec orders-service pytest
 - autenticação (login, token válido/inválido)
 - rotas protegidas (401)
 - criação de pedidos (201)
-- validação de payload (422)
+- listagem de pedidos (200)
 - atualização de status
+- validação de payload (422)
+
 
 ---
 
@@ -234,11 +236,19 @@ docker compose exec orders-service pytest
 
 O projeto utiliza GitHub Actions para execução automática de testes a cada `push` ou `pull request` na branch principal.
 
+![users-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-users.yml/badge.svg?branch=main)
+![orders-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders.yml/badge.svg?branch=main)
+![shell](https://github.com/joeccosta/ecotech/actions/workflows/ci-shell.yml/badge.svg?branch=main)
+![orders-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders-mfe.yml/badge.svg?branch=main)
+![login-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-login-mfe.yml/badge.svg?branch=main)
 ### Pipeline
 
 - execução de testes do `users-service`
 - execução de testes do `orders-service`
 - validação do ambiente via Docker
+- pipelines independentes para cada serviço (`users-service`, `orders-service`)
+- pipelines independentes para cada microfrontend (`shell`, `orders-mfe`, `login-mfe`)
+- execução automática de testes a cada `push` ou `pull request`
 
 ### Benefícios
 
