@@ -9,25 +9,25 @@
 
 ## 1. Contexto
 
-A Ecotech é uma empresa de e-commerce focada em vestuário esportivo sustentável. O processo atual de gestão de pedidos baseado em planilhas apresenta limitações como:
+A Ecotech é um e-commerce focado em moda esportiva sustentável. O processo atual de gestão de pedidos baseado em planilhas apresenta limitações como:
 
-- ausência de atualização em tempo real
-- erros manuais frequentes
-- dificuldade de rastreamento de pedidos
-- baixa escalabilidade
+- ausência de atualização em tempo real;
+- erros manuais frequentes;
+- dificuldade de rastreamento de pedidos;
+- baixa escalabilidade.
 
 Este projeto propõe um **Produto Mínimo Viável (PMV)** utilizando uma arquitetura moderna com **microsserviços** e **microfrontends**.
 
 ---
 
 ## 2. Arquitetura
-![alt text](ecotech-arquitetura.png)
+![Arquitetura do projeto](assets/ecotech-arquitetura2.png)
 
 ### Princípios adotados
 
-- baixo acoplamento entre serviços
-- separação de responsabilidades
-- escalabilidade independente
+- baixo acoplamento entre serviços;
+- separação de responsabilidades;
+- escalabilidade independente.
 
 ---
 
@@ -36,27 +36,26 @@ Este projeto propõe um **Produto Mínimo Viável (PMV)** utilizando uma arquite
 ### 3.1 users-service
 Responsável por autenticação e usuários:
 
-- criação de usuários
-- login (JWT)
-- validação de credenciais
+- criação de usuários;
+- login (JWT);
+- validação de credenciais.
 
 ### 3.2 orders-service
-Responsável por pedidos:
+Responsável por gestão dos pedidos:
 
-- criação de pedidos
-- listagem
-- filtro por status
-- filtro por ID do pedido (query param `order_id`)
-- filtro por nome do cliente (query param `customer_name`, busca parcial)
-- atualização de status
-- rotas protegidas por JWT
+- criação de pedidos;
+- listagem;
+- atualização de status; 
+- filtro por status (`enumerável com status`), por ID do pedido (`order_id`) e por nome do cliente (`customer_name`);
+- rota protegidas por JWT; 
+- integração com backend orders-service.
 
 ### 3.3 Banco de Dados
 
 Cada serviço possui seu próprio banco PostgreSQL:
 
-- isolamento de dados
-- independência de deploy
+- isolamento de dados;
+- independência de deploy.
 
 ---
 
@@ -65,15 +64,10 @@ Cada serviço possui seu próprio banco PostgreSQL:
 Arquitetura baseada em **microfrontends com single-spa**.
 
 ### Shell
-- orquestra os MFEs
-- gerencia rotas
+- orquestrador dos MFEs, realiza a gestão das rotas.
 
 ### orders-mfe
-- criação de pedidos
-- listagem
-- filtros por status, ID e nome do cliente
-- atualização de status
-- integração com orders-service
+- criação, listagem, filtragem e atualização (status) de pedidos.
 
 ---
 
@@ -81,11 +75,11 @@ Arquitetura baseada em **microfrontends com single-spa**.
 
 ### Fluxo
 
-1. Login no `users-service`
+1. Login no `users-service`;
 2. Geração de JWT com:
-   - `sub` (email do usuário)
-   - `exp` (expiração)
-3. Envio do token ao cliente
+   - `sub` (email do usuário);
+   - `exp` (expiração);
+3. Envio do token ao cliente.
 
 ### Uso
 
@@ -95,15 +89,13 @@ Authorization: Bearer <token>
 
 ### Validação
 
-- feita localmente em cada serviço
-- não há chamada entre serviços
-- depende de `SECRET_KEY` compartilhada
+- feita localmente em cada serviço;
+- não há chamada entre serviços;
+- depende de `SECRET_KEY` compartilhada.
 
 ### Benefícios
 
-- stateless
-- escalável
-- desacoplado
+- stateless, escalável e desacoplado.
 
 ### 5.1 Autenticação no Frontend (Microfrontends)
 
@@ -111,21 +103,20 @@ Além da validação no backend, o frontend implementa **controle de acesso por 
 
 #### Estratégia adotada
 
-- o token JWT é armazenado no `localStorage` após login
-- cada MFE verifica localmente se o usuário está autenticado
-- em caso negativo, ocorre redirecionamento para o `login-mfe`
+- o token JWT é armazenado no `localStorage` após login;
+- inicialmente, o orders-mfe verifica localmente se o usuário está autenticado;
+- em caso negativo, ocorre redirecionamento para o `login-mfe`.
 
 #### Proteções implementadas
 
-- bloqueio de acesso direto ao `shell` (`:9000`) (pendente)
-- bloqueio de acesso direto ao `orders-mfe` (`:8500`)
-- redirecionamento automático para login quando não autenticado
-- redirecionamento para o shell quando o usuário já está autenticado
+- bloqueio de acesso direto ao `orders-mfe` (`:8500`);
+- redirecionamento automático para login quando não autenticado;
+- redirecionamento para o shell quando o usuário já está autenticado.
 
 #### Responsabilidade por camada
 
-- **Frontend (MFE):** controle de navegação e experiência do usuário
-- **Backend (services):** validação real de segurança via JWT (401 Unauthorized)
+- **Frontend (MFE):** controle de navegação e experiência do usuário;
+- **Backend (services):** validação real de segurança via JWT (401 Unauthorized).
 
 Essa abordagem segue o princípio de **defesa em profundidade**, combinando validação visual no frontend com proteção efetiva no backend.
 
@@ -145,9 +136,8 @@ Essa abordagem segue o princípio de **defesa em profundidade**, combinando vali
 - single-spa
 
 ### Infra
-- Docker
-- Docker Compose
-- MongoDB (logs estruturados)
+- Docker;
+- MongoDB (logs estruturados).
 
 ---
 
@@ -159,13 +149,13 @@ docker compose up --build
 
 ### Endpoints
 
-- Frontend: http://localhost:9000
-- Users API: http://localhost:8001/docs
-- Orders API: http://localhost:8002/docs
+- Frontend: http://localhost:9000/orders;
+- Users API: http://localhost:8001/docs;
+- Orders API: http://localhost:8002/docs.
 
 ---
 
-## 7.1 Variáveis de Ambiente (.env)
+## 7.1 Configuração de Variáveis de Ambiente (.env)
 
 O projeto utiliza um arquivo `.env` na raiz para configuração dos serviços.
 
@@ -200,8 +190,7 @@ Sem esse alinhamento, a validação do JWT entre microsserviços falhará (erro 
 ---
 
 ## 8. Testes
-
-Executar:
+A implementação seguiu a estratégia no backend de Test Driven Development (TDD). Para executá-los: 
 
 ```bash
 docker compose exec users-service pytest
@@ -209,14 +198,17 @@ docker compose exec orders-service pytest
 ```
 
 ### Cobertura atual
+`orders-service`: 38 casos de teste.
+- autenticação (login, token válido/inválido);
+- rotas protegidas (401);
+- criação de pedidos (201);
+- listagem de pedidos (200);
+- atualização de status;
+- validação de payload (422);
 
-- autenticação (login, token válido/inválido)
-- rotas protegidas (401)
-- criação de pedidos (201)
-- listagem de pedidos (200)
-- atualização de status
-- validação de payload (422)
-
+`users service`: 16 casos de teste.
+- validação de credenciais válidas e inválidas;
+- criação de usuário, retorno correto de access_token, teste de rotas no caso de token inválido etc.
 
 ---
 
@@ -224,77 +216,58 @@ docker compose exec orders-service pytest
 
 O projeto utiliza GitHub Actions para execução automática de testes a cada `push` ou `pull request` na branch principal.
 
-![users-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-users.yml/badge.svg?branch=main)
-![orders-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders.yml/badge.svg?branch=main)
-![shell](https://github.com/joeccosta/ecotech/actions/workflows/ci-shell.yml/badge.svg?branch=main)
-![orders-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders-mfe.yml/badge.svg?branch=main)
-![login-mfe](https://github.com/joeccosta/ecotech/actions/workflows/ci-login-mfe.yml/badge.svg?branch=main)
 ### Pipeline
 
-- execução de testes do `users-service`
-- execução de testes do `orders-service`
-- validação do ambiente via Docker
-- pipelines independentes para cada serviço (`users-service`, `orders-service`)
-- pipelines independentes para cada microfrontend (`shell`, `orders-mfe`, `login-mfe`)
-- execução automática de testes a cada `push` ou `pull request`
+- execução de testes do `users-service`;
+- execução de testes do `orders-service`;
+- validação do ambiente via Docker;
+- pipelines independentes para cada serviço (`users-service`, `orders-service`);
+- pipelines independentes para cada microfrontend (`shell`, `orders-mfe`, `login-mfe`);
+- execução automática de testes a cada `push` ou `pull request`,
 
 ### Benefícios
 
-- garantia de integridade do código a cada alteração
-- detecção precoce de falhas
-- padronização do processo de build e teste
-
-### Status
-
-O status da pipeline pode ser acompanhado pelo badge no topo deste documento.
+- garantia de integridade do código;
+- detecção precoce de falhas;
+- padronização do processo de build e teste.
 
 ---
 
 ## 9. Decisões Técnicas
 
 ### JWT compartilhado
-- simplicidade para MVP
-- evita chamada entre serviços
+- simplicidade para MVP;
+- evita chamada entre serviços.
 
 ### Bancos separados
-- isolamento
-- resiliência
+- isolamento;
+- resiliência.
 
 ### FastAPI
-- produtividade
-- tipagem forte
+- produtividade;
+- tipagem forte.
 
 ### Microfrontends
-- deploy independente
-- escalabilidade de equipes
+- deploy independente;
+- times independentes;
+- possibilidade de adoção de diferentes frameworks.
 
 ---
 
-## 9.1 Logs Estruturados (MongoDB)
+## 9.1 Observabilidade (MongoDB)
 
-O projeto implementa logs estruturados persistidos em MongoDB como camada complementar ao banco relacional.
+O projeto implementa logs estruturados persistidos em MongoDB como camada complementar para o backend.
 
 ### Objetivo
 
-- registrar eventos de negócio e técnicos
-- permitir rastreabilidade de requisições
-- facilitar debugging e observabilidade
+- registrar eventos de negócio e técnicos;
+- permitir rastreabilidade de requisições;
+- facilitar debugging e observabilidade.
 
-### Arquitetura
-
-```
-[ orders-service ] ---> [ MongoDB (ecotech_logs.logs) ]
-```
-
-### Implementação
-
-- handler customizado (`mongo_logger.py`)
-- integração com o sistema de logging padrão do Python
-- inserção automática de documentos no MongoDB via `emit()`
 
 ### Estrutura do log
 
-Exemplo de documento armazenado:
+Exemplo:
 
 ```json
 {
@@ -311,7 +284,7 @@ Exemplo de documento armazenado:
 }
 ```
 
-### Variáveis de ambiente
+### Configuração de variáveis de ambiente
 
 ```
 MONGO_URI=mongodb://logs-mongo:27017
@@ -330,26 +303,24 @@ Isso imprime no console o documento antes da inserção.
 
 ### Benefícios
 
-- separação entre dados transacionais e observabilidade
-- suporte a análise posterior (logs históricos)
-- base para evolução com tracing e métricas
+- separação entre dados transacionais e observabilidade;
+- suporte a análise posterior (logs históricos);
+- base para evolução com tracing e métricas.
 
 ---
 
 ## 10. Próximos Passos
 
-- centralizar autenticação em um módulo compartilhado entre MFEs
-- implementar ProtectedRoute reutilizável
-- adicionar logout global no shell com contexto de usuário
-- persistir informações do usuário (ex: nome) no frontend
-- implementar refresh token e controle de expiração
-- considerar uso de armazenamento seguro (ex: httpOnly cookies)
-- integração completa do login no frontend
-- API Gateway / BFF
-- logs estruturados
-- observabilidade (tracing)
-- uso de chave pública (RS256)
-- testes no frontend
+- centralizar autenticação em um módulo compartilhado entre MFEs;
+- implementar ProtectedRoute reutilizável;
+- adicionar logout global no shell com contexto de usuário;
+- persistir informações do usuário (ex: nome) no frontend;
+- implementar refresh token e controle de expiração;
+- integração completa do login no frontend;
+- API Gateway / BFF (backend for frontend);
+- observabilidade (tracing);
+- uso de chave pública (RS256);
+- testes no frontend.
 
 ---
 
@@ -357,37 +328,13 @@ Isso imprime no console o documento antes da inserção.
 
 ### Entregas concluídas
 
-- backend funcional com `users-service` e `orders-service`
-- autenticação JWT entre serviços, com rotas protegidas e validação local do token
-- testes automatizados no backend cobrindo autenticação, validações e atualização de status
-- integração validada via Postman e frontend
-- ambiente dockerizado reproduzível com serviços isolados
-- persistência de logs estruturados no MongoDB para o `orders-service`
-- pipeline de CI com GitHub Actions validando automaticamente os testes dos microsserviços
-
-### Funcionalidades já implementadas
-
-- criação, listagem e filtros de pedidos (status, ID e cliente)
-- atualização de status de pedidos
-- cadastro e login de usuários
-- propagação de autenticação entre microsserviços
-- logging estruturado no console e no MongoDB
-- proteção de rotas no frontend com verificação de autenticação (JWT) e redirecionamento automático
-
-### Estado atual da arquitetura
-
-- microsserviços com bancos PostgreSQL separados
-- microfrontend `orders-mfe` integrado ao `orders-service`
-- shell com `single-spa` para orquestração do frontend
-- MongoDB como camada complementar de observabilidade
-
-### Próxima evolução natural
-
-- integrar completamente o fluxo de login ao frontend
-- replicar a persistência de logs estruturados no `users-service`
-- ampliar observabilidade com tracing e correlação entre serviços
-
----
+- backend funcional com `users-service` e `orders-service`;
+- autenticação JWT entre serviços, com rota protegida e validação local do token;
+- testes automatizados no backend; 
+- integração validada via Postman e frontend;
+- ambiente dockerizado reproduzível com serviços isolados;
+- persistência de logs estruturados no MongoDB para backend;
+- pipeline de CI com GitHub Actions.
 
 ## 12. Conclusão
 
