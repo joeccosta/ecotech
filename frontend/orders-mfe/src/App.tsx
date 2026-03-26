@@ -63,7 +63,7 @@ export default function Root() {
 
   return (
     <div style={{ padding: "24px" }}>
-      <h1>Ecotech Orders MFE</h1>
+      <h1>Ecotech Gestão de Pedidos</h1>
 
       <div style={{ marginBottom: "16px", display: "flex", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
         <div>
