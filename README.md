@@ -21,22 +21,7 @@ Este projeto propõe um **Produto Mínimo Viável (PMV)** utilizando uma arquite
 ---
 
 ## 2. Arquitetura
-
-```
-[ login-mfe :8501 ]
-        |
-        ↓
-[ Shell (single-spa) :9000 ]
-        |
-        |--- orders-mfe :8500
-        |
-        ↓
-[ orders-service :8002 ] ----> [ PostgreSQL orders_db ]
-        |
-        └-------------------> [ MongoDB ecotech_logs ]
-        |
-[ users-service  :8001 ] ----> [ PostgreSQL users_db ]
-```
+![alt text](ecotech-arquitetura.png)
 
 ### Princípios adotados
 
