@@ -324,18 +324,6 @@ Isso imprime no console o documento antes da inserção.
 
 ---
 
-## 11. Status do Projeto
-
-### Entregas concluídas
-
-- backend funcional com `users-service` e `orders-service`;
-- autenticação JWT entre serviços, com rota protegida e validação local do token;
-- testes automatizados no backend; 
-- integração validada via Postman e frontend;
-- ambiente dockerizado reproduzível com serviços isolados;
-- persistência de logs estruturados no MongoDB para backend;
-- pipeline de CI com GitHub Actions.
-
-## 12. Conclusão
+## 11. Conclusão
 
 O projeto demonstra a implementação de uma arquitetura distribuída moderna com autenticação segura, testes automatizados e separação clara de responsabilidades, servindo como base sólida para evolução.
