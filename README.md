@@ -1,4 +1,4 @@
-# Ecotech: Plataforma de Gestão de Pedidos de Vestuário Sustentável
+# Ecotech: Gestão de Pedidos de Moda Esportiva Sustentável
 
 ![users-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-users.yml/badge.svg?branch=main)
 ![orders-service](https://github.com/joeccosta/ecotech/actions/workflows/ci-orders.yml/badge.svg?branch=main)
